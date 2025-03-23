@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    android:background="@android:color/white">
+
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical"
+android:background="@drawable/card_gradient"
+    android:padding="24dp">
+    <ImageView
+        android:id="@+id/studentImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center"
+        android:src="@drawable/img_5" />
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:gravity="center_vertical"
+android:layout_marginBottom="12dp">
+
+<ImageView
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    android:src="@drawable/profileim"
+
+android:layout_marginEnd="12dp"/>
+
+<TextView
+    android:id="@+id/studentName"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Student Name"
+    android:textSize="20sp"
+android:textStyle="bold"
+android:textColor="@android:color/white"/>
+</LinearLayout>
+
+
+<View
+android:layout_width="match_parent"
+android:layout_height="1dp"
+android:background="@android:color/white"
+android:alpha="0.2"
+android:layout_marginBottom="12dp"/>
+
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:gravity="center_vertical"
+android:layout_marginBottom="8dp">
+
+
+<TextView
+    android:id="@+id/registration"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Reg No: 12345"
+    android:textSize="16sp"
+    android:textColor="@android:color/white"/>
+</LinearLayout>
+
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:gravity="center_vertical"
+android:layout_marginBottom="8dp">
+
+
+
+<TextView
+    android:id="@+id/section"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Section: A"
+    android:textSize="16sp"
+    android:textColor="@android:color/white"/>
+</LinearLayout>
+
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:gravity="center_vertical">
+
+
+
+<TextView
+    android:id="@+id/studentClass"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Class: 5"
+    android:textSize="16sp"
+    android:textColor="@android:color/white"/>
+</LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
