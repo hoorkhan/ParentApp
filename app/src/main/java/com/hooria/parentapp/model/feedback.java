@@ -3,17 +3,19 @@ package com.hooria.parentapp.model;
 public class feedback {
     private String guardianCNIC;
     private String feedbackText;
+    private String sentiment;
     private com.google.firebase.Timestamp timestamp;
     public feedback() {
     }
 
-    public feedback(String guardianCNIC, String feedbackText, com.google.firebase.Timestamp timestamp) {
+    public feedback(String guardianCNIC, String feedbackText, String sentiment,com.google.firebase.Timestamp timestamp) {
         this.guardianCNIC = guardianCNIC;
         this.feedbackText = feedbackText;
         this.timestamp = timestamp;
+        this.sentiment=sentiment;
     }
 
-    // Getters
+
     public String getGuardianCNIC() {
         return guardianCNIC;
     }
@@ -26,7 +28,15 @@ public class feedback {
         return timestamp;
     }
 
-    // Setters
+    public String getSentiment() {
+        return sentiment;
+    }
+
+    public void setSentiment(String sentiment) {
+        this.sentiment = sentiment;
+    }
+
+
     public void setGuardianCNIC(String guardianCNIC) {
         this.guardianCNIC = guardianCNIC;
     }

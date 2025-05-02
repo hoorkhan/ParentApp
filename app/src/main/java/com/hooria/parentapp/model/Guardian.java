@@ -1,15 +1,30 @@
 package com.hooria.parentapp.model;
 
+import java.util.List;
+
 public class Guardian {
 
     private String guardianId;
+    private String guardianDocId;
     private String Gname;
     private String number;
     private String CNIC;
     private String Email;
     private String QRcodeData;
+    private List<String> students;
+
+
+    private String profile_picture_url;
+
 
     public Guardian() {}
+    public List<String> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<String> students) {
+        this.students = students;
+    }
 
     // Getters and Setters
     public String getGuardianId() {
@@ -59,4 +74,21 @@ public class Guardian {
     public void setQRcodeData(String QRcodeData) {
         this.QRcodeData = QRcodeData;
     }
+    public String getProfile_picture_url() {
+        return profile_picture_url;
+    }
+
+    public void setProfile_picture_url(String profile_picture_url) {
+        this.profile_picture_url = profile_picture_url;
+    }
+    public String getGuardianDocId() {
+        return guardianDocId;
+    }
+
+    public void setGuardianDocId(String guardianDocId) {
+        this.guardianDocId = guardianDocId;
+    }
+
+
+
 }

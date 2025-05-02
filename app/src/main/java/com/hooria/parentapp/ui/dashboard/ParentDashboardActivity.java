@@ -2,11 +2,14 @@ package com.hooria.parentapp.ui.dashboard;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.room.Room;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,15 +21,21 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.hooria.parentapp.AppDatabase;
 import com.hooria.parentapp.Feedbackactivity;
+import com.hooria.parentapp.ProfileActivity;
 import com.hooria.parentapp.R;
 import com.hooria.parentapp.ReportActivity;
 import com.hooria.parentapp.StudentAdapter;
+import com.hooria.parentapp.StudentEntity;
 import com.hooria.parentapp.model.Student;
 import com.hooria.parentapp.ui.QrCodeActivity;
 import com.hooria.parentapp.ui.auth.Login;
@@ -35,138 +44,185 @@ import java.util.List;
 public class ParentDashboardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private TextView Gname, number;
     private RecyclerView studentList;
-    private FloatingActionButton showQRButton;
     private FirebaseFirestore db;
     private List<Student> students;
     private StudentAdapter studentAdapter;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    private SharedPreferences prefs;
-    private Toolbar toolbar;
+    private CardView qrCodeItem, reportItem, feedbackItem;
+    private TextView navGuardianName;
+    private AppDatabase localDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent_dashboard);
-        db = FirebaseFirestore.getInstance();
-        toolbar = findViewById(R.id.toolbar);
-        prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        setSupportActionBar(toolbar);
 
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+
+        db = FirebaseFirestore.getInstance();
+        localDb = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "guardian_local_db")
+                .fallbackToDestructiveMigration()
+                .build();
+
+        // Views
         Gname = findViewById(R.id.Gname);
         number = findViewById(R.id.number);
         studentList = findViewById(R.id.studentList);
-        showQRButton = findViewById(R.id.showQRButton);
+        qrCodeItem = findViewById(R.id.qrCodeItem);
+        reportItem = findViewById(R.id.reportItem);
+        feedbackItem = findViewById(R.id.feedbackItem);
 
+        // Drawer & Navigation
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        navGuardianName = headerView.findViewById(R.id.nav_guardian_name);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        navigationView.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close
+        );
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(this);
-
+        // Recycler setup
         students = new ArrayList<>();
-        studentAdapter = new StudentAdapter(students,this);
+        studentAdapter = new StudentAdapter(students, this);
         studentList.setLayoutManager(new LinearLayoutManager(this));
         studentList.setAdapter(studentAdapter);
 
         fetchGuardianDetails();
-        fetchStudents();
 
-        showQRButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, QrCodeActivity.class);
-            startActivity(intent);
-        });
+        // Card listeners
+        qrCodeItem.setOnClickListener(v -> startActivity(new Intent(this, QrCodeActivity.class)));
+        reportItem.setOnClickListener(v -> startActivity(new Intent(this, ReportActivity.class)));
+        feedbackItem.setOnClickListener(v -> startActivity(new Intent(this, Feedbackactivity.class)));
     }
 
     private void fetchGuardianDetails() {
-        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        String cnic = prefs.getString("CNIC", null);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (cnic == null) {
-            Toast.makeText(this, "CNIC not found. Please log in again.", Toast.LENGTH_SHORT).show();
-            logoutUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Not authenticated", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        db.collection("guardians")
-                .whereEqualTo("CNIC", cnic)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
-                        Gname.setText(documentSnapshot.getString("Gname"));
-                        number.setText(documentSnapshot.getString("number"));
-                        fetchStudents();
-                    } else {
-                        Toast.makeText(this, "Guardian not found", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching guardian", e));
-    }
+        String uid = currentUser.getUid();
 
-    private void fetchStudents() {
-        String guardianCNIC = prefs.getString("CNIC", null);
-        if (guardianCNIC == null) {
-            Toast.makeText(this, "Guardian CNIC not found!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        db.collection("students")
-                .whereEqualTo("CNIC", guardianCNIC)
+        db.collection("guardians").document(uid)
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        students.clear();
-                        for (DocumentSnapshot document : queryDocumentSnapshots) {
-                            Student student = document.toObject(Student.class);
-                            Log.d("Firestore", "Fetched Student: " + student.getSname() + ", Image URL: " + student.getImage());
-                            students.add(student);
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String name = doc.getString("Gname");
+                        String phone = doc.getString("number");
+
+                        Gname.setText(name != null ? name : "Unknown");
+                        number.setText(phone != null ? phone : "N/A");
+                        navGuardianName.setText(name != null ? name : "Guardian");
+
+                        List<String> studentDocIds = (List<String>) doc.get("students");
+                        if (studentDocIds != null && !studentDocIds.isEmpty()) {
+                            fetchStudentsByDocIds(studentDocIds);
+                        } else {
+                            Toast.makeText(this, "No students linked to this guardian", Toast.LENGTH_SHORT).show();
                         }
-                        studentAdapter.notifyDataSetChanged();
                     } else {
-                        Toast.makeText(this, "No students found!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Guardian record not found", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );}
-
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.nav_report) {
-            startActivity(new Intent(this, ReportActivity.class));
-        } else if (id == R.id.nav_feedback) {
-            startActivity(new Intent(this, Feedbackactivity.class));
-        }
-        else if (id == R.id.nav_logout) {
-            logoutUser();
-        }
-
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
+                .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
+
+    private void fetchStudentsByDocIds(List<String> studentDocIds) {
+        students.clear();
+
+        List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
+        for (String docId : studentDocIds) {
+            tasks.add(db.collection("students").document(docId).get());
+        }
+
+        Tasks.whenAllSuccess(tasks)
+                .addOnSuccessListener(results -> {
+                    for (Object obj : results) {
+                        DocumentSnapshot doc = (DocumentSnapshot) obj;
+                        if (doc.exists()) {
+                            Student student = doc.toObject(Student.class);
+                            if (student != null) {
+                                student.setStudentDocId(doc.getId());
+                                students.add(student);
+                            }
+                        }
+                    }
+                    studentAdapter.notifyDataSetChanged();
+
+                    List<StudentEntity> studentEntities = new ArrayList<>();
+                    for (Student student : students) {
+                        StudentEntity entity = new StudentEntity();
+                        entity.studentId = student.getStudentDocId();
+                        entity.Sname = student.getSname();
+                        entity.reg = student.getReg();
+                        entity.studentClass = student.getStudentClass();
+                        entity.section = student.getSection();
+                        entity.image = student.getImage();
+                        studentEntities.add(entity);
+                    }
+
+                    new Thread(() -> localDb.studentDao().insertStudents(studentEntities)).start();
+                })
+               // .addOnFailureListener(e -> Toast.makeText(this, "Failed to load students", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+
+                    new Thread(() -> {
+                        List<StudentEntity> cached = localDb.studentDao().getAllStudents();
+                        List<Student> fallbackList = new ArrayList<>();
+                        for (StudentEntity s : cached) {
+                            Student student = new Student();
+                            student.setStudentDocId(s.studentId);
+                            student.setSname(s.Sname);
+                            student.setReg(s.reg);
+                            student.setStudentClass(s.studentClass);
+                            student.setSection(s.section);
+                            student.setImage(s.image);
+                            fallbackList.add(student);
+                        }
+
+                        runOnUiThread(() -> {
+                            students.clear();
+                            students.addAll(fallbackList);
+                            studentAdapter.notifyDataSetChanged();
+                            Toast.makeText(this, "Showing offline data", Toast.LENGTH_SHORT).show();
+                        });
+                    }).start();
+                });
+    }
+
 
     private void logoutUser() {
         FirebaseAuth.getInstance().signOut();
-        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        prefs.edit().clear().apply();
-
         Intent intent = new Intent(this, Login.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.nav_profile) {
+            startActivity(new Intent(this, ProfileActivity.class));
+        } else if (id == R.id.nav_logout) {
+            logoutUser();
+        }
+
+        drawerLayout.closeDrawers();
+        return true;
+    }
 }
-
-
-
 
 

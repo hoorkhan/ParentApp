@@ -24,9 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="130dp"
         android:text="Parent Login"
+        android:fontFamily="@font/montserrat_bold"
         android:textColor="@android:color/white"
         android:textSize="36sp"
-        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -57,23 +57,23 @@
             android:padding="12dp"
             android:textColorHint="@color/white"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:fontFamily="@font/montserrat_bold" />
 
 
         <EditText
-            android:id="@+id/CNIC"
+            android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="15dp"
             android:background="@drawable/editbg"
-            android:hint="Enter CNIC"
+            android:hint="Enter password"
             android:singleLine="true"
             android:maxLines="1"
-            android:inputType="number"
+            android:inputType="textPassword"
             android:padding="12dp"
             android:textColorHint="@color/white"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:fontFamily="@font/montserrat_bold" />
 
 
 
@@ -88,8 +88,9 @@
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
         android:text="Login"
-        android:textStyle="bold"
+        android:fontFamily="@font/montserrat_bold"
         android:textSize="18sp"
+        android:textColor="@color/white"
         android:backgroundTint="#0090E9"
         android:drawableRight="@drawable/baseline_keyboard_arrow_right_24"
         app:background="@drawable/button_blue"

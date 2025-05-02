@@ -1,6 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ParentApp</string>
-    <string name="navigation_drawer_open">Open Navigation</string>
-    <string name="navigation_drawer_close">Close Navigation</string>
+
+        <string name="app_name">ParentApp</string>
+        <string name="navigation_drawer_open">Open Navigation</string>
+        <string name="navigation_drawer_close">Close Navigation</string>
+
 
 </resources>

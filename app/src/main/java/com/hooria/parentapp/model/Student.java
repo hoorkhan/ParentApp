@@ -2,7 +2,7 @@ package com.hooria.parentapp.model;
 
 public class Student {
 
-        private String studentId;
+        private String studentDocId;
         private String Sname;
         private String reg;
         private String studentClass;
@@ -22,13 +22,7 @@ public class Student {
         }
 
         // Getters and Setters
-        public String getStudentId() {
-                return studentId;
-        }
 
-        public void setStudentId(String studentId) {
-                this.studentId = studentId;
-        }
 
         public String getSname() {
                 return Sname;
@@ -68,5 +62,13 @@ public class Student {
 
         public void setCNIC(String CNIC) {
                 this.CNIC = CNIC;
+        }
+
+        public String getStudentDocId() {
+                return studentDocId;
+        }
+
+        public void setStudentDocId(String studentDocId) {
+                this.studentDocId = studentDocId;
         }
 }

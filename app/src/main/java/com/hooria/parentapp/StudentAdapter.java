@@ -2,6 +2,7 @@ package com.hooria.parentapp;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,16 +53,16 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
         Log.d("StudentAdapter", "Image URL: " + student.getImage()); // Debugging
 
         Glide.with(context)
-                .load(student.getImage())
-                .placeholder(R.drawable.img_5) // Show while loading
-                .error(R.drawable.img_5) // Show if error occurs
+                .load(TextUtils.isEmpty(student.getImage()) ? R.drawable.img_5 : student.getImage().trim()) // Provide fallback if the URL is empty or invalid
+                .placeholder(R.drawable.img_5) // Show placeholder while loading
+                .error(R.drawable.img_5) // Show default error image if it fails
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
                                                 Target<Drawable> target, boolean isFirstResource) {
                         Log.e("GlideError", "Failed to load image: " + student.getImage(), e);
-                        return false; // Keep default error image
+                        return false; // Keep the default error image
                     }
 
                     @Override
@@ -72,6 +73,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
                     }
                 })
                 .into(holder.studentImage);
+
     }
 
     @Override

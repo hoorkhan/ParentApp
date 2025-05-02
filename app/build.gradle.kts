@@ -44,19 +44,31 @@ dependencies {
     implementation ("com.google.firebase:firebase-analytics")
     implementation ("com.google.firebase:firebase-auth")
     implementation ("com.google.firebase:firebase-firestore")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("androidx.room:room-runtime:2.6.1")
+    annotationProcessor ("androidx.room:room-compiler:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel:2.6.1")
+    implementation ("androidx.room:room-ktx:2.6.1" )
+
 
     implementation( "com.google.android.material:material:1.11.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
 
-    implementation ("com.github.bumptech.glide:glide:4.15.1")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
+
+    implementation ("com.airbnb.android:lottie:6.1.0")
 
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.2.1")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.6.1")
-
     implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
     implementation ("androidx.lifecycle:lifecycle-livedata:2.6.2")
+    implementation("com.cloudinary:cloudinary-android:2.1.0")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
+    implementation ("com.airbnb.android:lottie:6.4.0")
+
+
+
 }
 apply(plugin = "com.google.gms.google-services")
